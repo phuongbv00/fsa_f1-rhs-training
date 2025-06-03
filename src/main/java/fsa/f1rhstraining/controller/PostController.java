@@ -34,10 +34,23 @@ public class PostController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Get posts by author
-    @GetMapping("/author/{author}")
-    public ResponseEntity<List<PostDto>> getPostsByAuthor(@PathVariable String author) {
-        List<PostDto> posts = postService.getPostsByAuthor(author);
+    // Get posts by author username
+    @GetMapping("/author/{username}")
+    public ResponseEntity<List<PostDto>> getPostsByAuthor(@PathVariable String username) {
+        try {
+            List<PostDto> posts = postService.getPostsByAuthor(username);
+            return posts.isEmpty() 
+                    ? ResponseEntity.noContent().build() 
+                    : ResponseEntity.ok(posts);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Get posts by user ID
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<PostDto>> getPostsByUserId(@PathVariable Long userId) {
+        List<PostDto> posts = postService.getPostsByUserId(userId);
         return posts.isEmpty() 
                 ? ResponseEntity.noContent().build() 
                 : ResponseEntity.ok(posts);

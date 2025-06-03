@@ -2,8 +2,10 @@ package fsa.f1rhstraining.service;
 
 import fsa.f1rhstraining.dto.PostDto;
 import fsa.f1rhstraining.entity.Post;
+import fsa.f1rhstraining.entity.User;
 import fsa.f1rhstraining.mapper.PostMapper;
 import fsa.f1rhstraining.repository.PostRepository;
+import fsa.f1rhstraining.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,11 +18,13 @@ import java.util.Optional;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
     private final PostMapper postMapper;
 
     @Autowired
-    public PostService(PostRepository postRepository, PostMapper postMapper) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, PostMapper postMapper) {
         this.postRepository = postRepository;
+        this.userRepository = userRepository;
         this.postMapper = postMapper;
     }
 
@@ -36,9 +40,17 @@ public class PostService {
                 .map(postMapper::toDto);
     }
 
-    // Get posts by author
-    public List<PostDto> getPostsByAuthor(String author) {
+    // Get posts by author username
+    public List<PostDto> getPostsByAuthor(String username) {
+        User author = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username));
         List<Post> posts = postRepository.findByAuthor(author);
+        return postMapper.toDtoList(posts);
+    }
+
+    // Get posts by user ID
+    public List<PostDto> getPostsByUserId(Long userId) {
+        List<Post> posts = postRepository.findByAuthorId(userId);
         return postMapper.toDtoList(posts);
     }
 
@@ -64,7 +76,15 @@ public class PostService {
                 .map(existingPost -> {
                     existingPost.setTitle(postDto.getTitle());
                     existingPost.setContent(postDto.getContent());
-                    existingPost.setAuthor(postDto.getAuthor());
+
+                    // Update author if userId has changed
+                    if (postDto.getUserId() != null && 
+                        (existingPost.getAuthor() == null || !existingPost.getAuthor().getId().equals(postDto.getUserId()))) {
+                        User author = userRepository.findById(postDto.getUserId())
+                                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + postDto.getUserId()));
+                        existingPost.setAuthor(author);
+                    }
+
                     existingPost.setUpdatedAt(LocalDateTime.now());
                     Post updatedPost = postRepository.save(existingPost);
                     return postMapper.toDto(updatedPost);

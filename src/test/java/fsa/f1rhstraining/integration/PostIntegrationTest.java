@@ -1,6 +1,7 @@
 package fsa.f1rhstraining.integration;
 
 import fsa.f1rhstraining.dto.PostDto;
+import fsa.f1rhstraining.dto.UserDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,29 +32,51 @@ public class PostIntegrationTest {
         return "http://localhost:" + port + "/api/posts";
     }
 
+    private String getUserBaseUrl() {
+        return "http://localhost:" + port + "/api/users";
+    }
+
     @Test
     public void testCrudOperations() {
+        // Create a test user first
+        UserDto userToCreate = UserDto.builder()
+                .username("integration_tester")
+                .email("integration@test.com")
+                .password("password123")
+                .fullName("Integration Tester")
+                .build();
+
+        ResponseEntity<UserDto> userCreateResponse = restTemplate.postForEntity(
+                getUserBaseUrl(), userToCreate, UserDto.class);
+
+        assertThat(userCreateResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(userCreateResponse.getBody()).isNotNull();
+        assertThat(userCreateResponse.getBody().getId()).isNotNull();
+
+        Long userId = userCreateResponse.getBody().getId();
+
         // Create a post
         PostDto postToCreate = PostDto.builder()
                 .title("Integration Test Post")
                 .content("This is a test post for integration testing")
-                .author("Integration Tester")
+                .userId(userId)
+                .authorUsername("integration_tester")
                 .build();
 
         ResponseEntity<PostDto> createResponse = restTemplate.postForEntity(
                 getBaseUrl(), postToCreate, PostDto.class);
-        
+
         assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(createResponse.getBody()).isNotNull();
         assertThat(createResponse.getBody().getId()).isNotNull();
         assertThat(createResponse.getBody().getTitle()).isEqualTo("Integration Test Post");
-        
+
         Long postId = createResponse.getBody().getId();
 
         // Get the post by ID
         ResponseEntity<PostDto> getResponse = restTemplate.getForEntity(
                 getBaseUrl() + "/" + postId, PostDto.class);
-        
+
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(getResponse.getBody()).isNotNull();
         assertThat(getResponse.getBody().getId()).isEqualTo(postId);
@@ -69,7 +92,7 @@ public class PostIntegrationTest {
                 HttpMethod.PUT,
                 new HttpEntity<>(postToUpdate),
                 PostDto.class);
-        
+
         assertThat(updateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(updateResponse.getBody()).isNotNull();
         assertThat(updateResponse.getBody().getTitle()).isEqualTo("Updated Integration Test Post");
@@ -81,7 +104,7 @@ public class PostIntegrationTest {
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<PostDto>>() {});
-        
+
         assertThat(getAllResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(getAllResponse.getBody()).isNotNull();
         assertThat(getAllResponse.getBody()).hasSize(1);
@@ -92,7 +115,7 @@ public class PostIntegrationTest {
         // Verify the post is deleted
         ResponseEntity<PostDto> getAfterDeleteResponse = restTemplate.getForEntity(
                 getBaseUrl() + "/" + postId, PostDto.class);
-        
+
         assertThat(getAfterDeleteResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 }

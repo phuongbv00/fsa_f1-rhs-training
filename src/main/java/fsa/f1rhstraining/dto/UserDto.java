@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostDto {
+public class UserDto {
     private Long id;
-    private String title;
-    private String content;
-    private Long userId;
-    private String authorUsername;
+    private String username;
+    private String email;
+    private String password;
+    private String fullName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

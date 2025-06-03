@@ -50,9 +50,9 @@ public class PostControllerTest {
     public void testGetAllPosts() throws Exception {
         PostDto post1 = createSamplePost(1L, "First Post", "Content 1", "Author 1");
         PostDto post2 = createSamplePost(2L, "Second Post", "Content 2", "Author 2");
-        
+
         when(postService.getAllPosts()).thenReturn(Arrays.asList(post1, post2));
-        
+
         mockMvc.perform(get("/api/posts"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
@@ -64,9 +64,9 @@ public class PostControllerTest {
     @Test
     public void testGetPostById() throws Exception {
         PostDto post = createSamplePost(1L, "Test Post", "Test Content", "Test Author");
-        
+
         when(postService.getPostById(1L)).thenReturn(Optional.of(post));
-        
+
         mockMvc.perform(get("/api/posts/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
@@ -77,9 +77,9 @@ public class PostControllerTest {
     public void testCreatePost() throws Exception {
         PostDto postToCreate = createSamplePost(null, "New Post", "New Content", "New Author");
         PostDto createdPost = createSamplePost(1L, "New Post", "New Content", "New Author");
-        
+
         when(postService.createPost(any(PostDto.class))).thenReturn(createdPost);
-        
+
         mockMvc.perform(post("/api/posts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(postToCreate)))
@@ -91,9 +91,9 @@ public class PostControllerTest {
     @Test
     public void testUpdatePost() throws Exception {
         PostDto postToUpdate = createSamplePost(1L, "Updated Post", "Updated Content", "Updated Author");
-        
+
         when(postService.updatePost(eq(1L), any(PostDto.class))).thenReturn(Optional.of(postToUpdate));
-        
+
         mockMvc.perform(put("/api/posts/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(postToUpdate)))
@@ -104,17 +104,31 @@ public class PostControllerTest {
     @Test
     public void testDeletePost() throws Exception {
         when(postService.deletePost(1L)).thenReturn(true);
-        
+
         mockMvc.perform(delete("/api/posts/1"))
                 .andExpect(status().isNoContent());
     }
 
-    private PostDto createSamplePost(Long id, String title, String content, String author) {
+    @Test
+    public void testGetPostsByUserId() throws Exception {
+        PostDto post1 = createSamplePost(1L, "User 1 Post 1", "Content 1", "user1");
+        PostDto post2 = createSamplePost(1L, "User 1 Post 2", "Content 2", "user1");
+
+        when(postService.getPostsByUserId(1L)).thenReturn(Arrays.asList(post1, post2));
+
+        mockMvc.perform(get("/api/posts/user/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("User 1 Post 1"))
+                .andExpect(jsonPath("$[1].title").value("User 1 Post 2"));
+    }
+
+    private PostDto createSamplePost(Long id, String title, String content, String authorUsername) {
         return PostDto.builder()
                 .id(id)
                 .title(title)
                 .content(content)
-                .author(author)
+                .userId(id != null ? id : 1L) // Use the post id as the user id for simplicity in tests
+                .authorUsername(authorUsername)
                 .createdAt(LocalDateTime.now())
                 .build();
     }
