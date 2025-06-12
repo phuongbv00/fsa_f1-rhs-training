@@ -3,6 +3,9 @@ package fsa.f1rhstraining.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fsa.f1rhstraining.dto.PostDto;
 import fsa.f1rhstraining.service.PostService;
+import fsa.f1rhstraining.service.impl.PostServiceImpl;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,16 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class PostControllerTest {
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        @Primary
-        public PostService postService() {
-            return Mockito.mock(PostService.class);
-        }
-    }
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -46,13 +39,18 @@ public class PostControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @BeforeAll
+    public static void setup() {
+        // insert posts -> DB
+    }
+
+    @AfterAll
+    public static void cleanup() {
+        // delete posts from DB
+    }
+
     @Test
     public void testGetAllPosts() throws Exception {
-        PostDto post1 = createSamplePost(1L, "First Post", "Content 1", "Author 1");
-        PostDto post2 = createSamplePost(2L, "Second Post", "Content 2", "Author 2");
-
-        when(postService.getAllPosts()).thenReturn(Arrays.asList(post1, post2));
-
         mockMvc.perform(get("/api/posts"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
@@ -63,10 +61,6 @@ public class PostControllerTest {
 
     @Test
     public void testGetPostById() throws Exception {
-        PostDto post = createSamplePost(1L, "Test Post", "Test Content", "Test Author");
-
-        when(postService.getPostById(1L)).thenReturn(Optional.of(post));
-
         mockMvc.perform(get("/api/posts/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))

@@ -3,6 +3,7 @@ package fsa.f1rhstraining.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fsa.f1rhstraining.dto.UserDto;
 import fsa.f1rhstraining.service.UserService;
+import fsa.f1rhstraining.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ public class UserControllerTest {
         @Bean
         @Primary
         public UserService userService() {
-            return Mockito.mock(UserService.class);
+            return Mockito.mock(UserServiceImpl.class);
         }
     }
 
