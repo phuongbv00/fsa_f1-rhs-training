@@ -1,0 +1,3 @@
+PostDto(id=3, title=Tech Review 2025, content=null, userId=null, authorUsername=null, createdAt=null, updatedAt=null)
+PostDto(id=4, title=Travel Tips, content=null, userId=null, authorUsername=null, createdAt=null, updatedAt=null)
+PostDto(id=21, title=Tech Tutorial, content=null, userId=null, authorUsername=null, createdAt=null, updatedAt=null)
