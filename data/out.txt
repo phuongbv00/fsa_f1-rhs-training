@@ -1,3 +1,3 @@
-PostDto(id=3, title=Tech Review 2025, content=null, userId=null, authorUsername=null, createdAt=null, updatedAt=null)
-PostDto(id=4, title=Travel Tips, content=null, userId=null, authorUsername=null, createdAt=null, updatedAt=null)
-PostDto(id=21, title=Tech Tutorial, content=null, userId=null, authorUsername=null, createdAt=null, updatedAt=null)
+Post(id=2, title=Tech Review 2025, content=Latest gadgets and technology trends for 2025, author=fsa.f1rhstraining.entity.User@72f369e7, createdAt=2025-06-17T15:12:48.788953, updatedAt=2025-06-17T15:12:48.788958)
+Post(id=3, title=Travel Tips, content=Essential tips for budget traveling in Europe, author=fsa.f1rhstraining.entity.User@50950fa9, createdAt=2025-06-17T15:12:48.789118, updatedAt=2025-06-17T15:12:48.789123)
+Post(id=18, title=Tech Tutorial, content=Programming basics tutorial, author=fsa.f1rhstraining.entity.User@72f369e7, createdAt=2025-06-17T15:12:48.801811, updatedAt=2025-06-17T15:12:48.801815)
