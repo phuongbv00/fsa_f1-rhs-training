@@ -15,12 +15,12 @@ import java.time.Instant;
 @RequestMapping("job")
 public class JobController {
     private final JobLauncher jobLauncher;
-    private final Job postDelJob;
+    private final Job uc01Job;
 
     public JobController(JobLauncher jobLauncher,
-                         @Qualifier("postDelJob") Job postDelJob) {
+                         @Qualifier("uc01Job") Job uc01Job) {
         this.jobLauncher = jobLauncher;
-        this.postDelJob = postDelJob;
+        this.uc01Job = uc01Job;
     }
 
     @GetMapping("launch")
@@ -29,7 +29,7 @@ public class JobController {
             JobParameters params = new JobParametersBuilder()
                     .addString("startTime", Instant.now().toString())
                     .toJobParameters();
-            jobLauncher.run(postDelJob, params);
+            jobLauncher.run(uc01Job, params);
         } catch (Exception e) {
             e.printStackTrace();
         }
